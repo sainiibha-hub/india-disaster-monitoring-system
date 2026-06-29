@@ -11,6 +11,8 @@ standalone JS dashboard.
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+![Dashboard screenshot](docs/dashboard.png)
+
 ## What it does
 
 | Hazard | Source | Behaviour |
