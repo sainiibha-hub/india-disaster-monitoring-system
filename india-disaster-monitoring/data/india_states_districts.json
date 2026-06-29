@@ -1,0 +1,167 @@
+{
+  "_note": "Representative sample of states/UTs with major districts/cities and approximate coordinates. India has 700+ districts; this list is intentionally kept compact for demo/runtime cost reasons. Extend this file with more entries (same shape) to cover every district -- the rest of the system (rainfall.py) reads whatever is in this file, so no code changes are required to scale it up.",
+  "states": [
+    {"state": "Andhra Pradesh", "districts": [
+      {"district": "Visakhapatnam", "lat": 17.6868, "lon": 83.2185},
+      {"district": "Vijayawada", "lat": 16.5062, "lon": 80.6480},
+      {"district": "Guntur", "lat": 16.3067, "lon": 80.4365},
+      {"district": "Tirupati", "lat": 13.6288, "lon": 79.4192}
+    ]},
+    {"state": "Arunachal Pradesh", "districts": [
+      {"district": "Itanagar", "lat": 27.0844, "lon": 93.6053},
+      {"district": "Tawang", "lat": 27.5859, "lon": 91.8594}
+    ]},
+    {"state": "Assam", "districts": [
+      {"district": "Guwahati", "lat": 26.1445, "lon": 91.7362},
+      {"district": "Dibrugarh", "lat": 27.4728, "lon": 94.9120},
+      {"district": "Silchar", "lat": 24.8333, "lon": 92.7789}
+    ]},
+    {"state": "Bihar", "districts": [
+      {"district": "Patna", "lat": 25.5941, "lon": 85.1376},
+      {"district": "Gaya", "lat": 24.7955, "lon": 84.9994},
+      {"district": "Muzaffarpur", "lat": 26.1209, "lon": 85.3647}
+    ]},
+    {"state": "Chhattisgarh", "districts": [
+      {"district": "Raipur", "lat": 21.2514, "lon": 81.6296},
+      {"district": "Bilaspur", "lat": 22.0797, "lon": 82.1409},
+      {"district": "Durg", "lat": 21.1904, "lon": 81.2849}
+    ]},
+    {"state": "Goa", "districts": [
+      {"district": "Panaji", "lat": 15.4909, "lon": 73.8278},
+      {"district": "Margao", "lat": 15.2832, "lon": 73.9862}
+    ]},
+    {"state": "Gujarat", "districts": [
+      {"district": "Ahmedabad", "lat": 23.0225, "lon": 72.5714},
+      {"district": "Surat", "lat": 21.1702, "lon": 72.8311},
+      {"district": "Vadodara", "lat": 22.3072, "lon": 73.1812},
+      {"district": "Rajkot", "lat": 22.3039, "lon": 70.8022}
+    ]},
+    {"state": "Haryana", "districts": [
+      {"district": "Gurugram", "lat": 28.4595, "lon": 77.0266},
+      {"district": "Faridabad", "lat": 28.4089, "lon": 77.3178},
+      {"district": "Ambala", "lat": 30.3782, "lon": 76.7767},
+      {"district": "Panchkula", "lat": 30.6942, "lon": 76.8606}
+    ]},
+    {"state": "Himachal Pradesh", "districts": [
+      {"district": "Shimla", "lat": 31.1048, "lon": 77.1734},
+      {"district": "Manali", "lat": 32.2432, "lon": 77.1892},
+      {"district": "Dharamshala", "lat": 32.2190, "lon": 76.3234}
+    ]},
+    {"state": "Jharkhand", "districts": [
+      {"district": "Ranchi", "lat": 23.3441, "lon": 85.3096},
+      {"district": "Jamshedpur", "lat": 22.8046, "lon": 86.2029},
+      {"district": "Dhanbad", "lat": 23.7957, "lon": 86.4304}
+    ]},
+    {"state": "Karnataka", "districts": [
+      {"district": "Bengaluru", "lat": 12.9716, "lon": 77.5946},
+      {"district": "Mysuru", "lat": 12.2958, "lon": 76.6394},
+      {"district": "Mangaluru", "lat": 12.9141, "lon": 74.8560},
+      {"district": "Hubli", "lat": 15.3647, "lon": 75.1240}
+    ]},
+    {"state": "Kerala", "districts": [
+      {"district": "Thiruvananthapuram", "lat": 8.5241, "lon": 76.9366},
+      {"district": "Kochi", "lat": 9.9312, "lon": 76.2673},
+      {"district": "Kozhikode", "lat": 11.2588, "lon": 75.7804},
+      {"district": "Idukki", "lat": 9.8500, "lon": 77.1000},
+      {"district": "Wayanad", "lat": 11.6854, "lon": 76.1320}
+    ]},
+    {"state": "Madhya Pradesh", "districts": [
+      {"district": "Bhopal", "lat": 23.2599, "lon": 77.4126},
+      {"district": "Indore", "lat": 22.7196, "lon": 75.8577},
+      {"district": "Jabalpur", "lat": 23.1815, "lon": 79.9864},
+      {"district": "Gwalior", "lat": 26.2183, "lon": 78.1828}
+    ]},
+    {"state": "Maharashtra", "districts": [
+      {"district": "Mumbai", "lat": 19.0760, "lon": 72.8777},
+      {"district": "Pune", "lat": 18.5204, "lon": 73.8567},
+      {"district": "Nagpur", "lat": 21.1458, "lon": 79.0882},
+      {"district": "Nashik", "lat": 19.9975, "lon": 73.7898}
+    ]},
+    {"state": "Manipur", "districts": [
+      {"district": "Imphal", "lat": 24.8170, "lon": 93.9368}
+    ]},
+    {"state": "Meghalaya", "districts": [
+      {"district": "Shillong", "lat": 25.5788, "lon": 91.8933},
+      {"district": "Cherrapunji", "lat": 25.2702, "lon": 91.7323}
+    ]},
+    {"state": "Mizoram", "districts": [
+      {"district": "Aizawl", "lat": 23.7271, "lon": 92.7176}
+    ]},
+    {"state": "Nagaland", "districts": [
+      {"district": "Kohima", "lat": 25.6747, "lon": 94.1086}
+    ]},
+    {"state": "Odisha", "districts": [
+      {"district": "Bhubaneswar", "lat": 20.2961, "lon": 85.8245},
+      {"district": "Cuttack", "lat": 20.4625, "lon": 85.8830},
+      {"district": "Puri", "lat": 19.8135, "lon": 85.8312}
+    ]},
+    {"state": "Punjab", "districts": [
+      {"district": "Amritsar", "lat": 31.6340, "lon": 74.8723},
+      {"district": "Ludhiana", "lat": 30.9010, "lon": 75.8573},
+      {"district": "Jalandhar", "lat": 31.3260, "lon": 75.5762}
+    ]},
+    {"state": "Rajasthan", "districts": [
+      {"district": "Jaipur", "lat": 26.9124, "lon": 75.7873},
+      {"district": "Jodhpur", "lat": 26.2389, "lon": 73.0243},
+      {"district": "Udaipur", "lat": 24.5854, "lon": 73.7125}
+    ]},
+    {"state": "Sikkim", "districts": [
+      {"district": "Gangtok", "lat": 27.3389, "lon": 88.6065}
+    ]},
+    {"state": "Tamil Nadu", "districts": [
+      {"district": "Chennai", "lat": 13.0827, "lon": 80.2707},
+      {"district": "Coimbatore", "lat": 11.0168, "lon": 76.9558},
+      {"district": "Madurai", "lat": 9.9252, "lon": 78.1198},
+      {"district": "Nagapattinam", "lat": 10.7672, "lon": 79.8449}
+    ]},
+    {"state": "Telangana", "districts": [
+      {"district": "Hyderabad", "lat": 17.3850, "lon": 78.4867},
+      {"district": "Warangal", "lat": 17.9784, "lon": 79.6000}
+    ]},
+    {"state": "Tripura", "districts": [
+      {"district": "Agartala", "lat": 23.8315, "lon": 91.2868}
+    ]},
+    {"state": "Uttar Pradesh", "districts": [
+      {"district": "Lucknow", "lat": 26.8467, "lon": 80.9462},
+      {"district": "Kanpur", "lat": 26.4499, "lon": 80.3319},
+      {"district": "Varanasi", "lat": 25.3176, "lon": 82.9739},
+      {"district": "Gorakhpur", "lat": 26.7606, "lon": 83.3732}
+    ]},
+    {"state": "Uttarakhand", "districts": [
+      {"district": "Dehradun", "lat": 30.3165, "lon": 78.0322},
+      {"district": "Haridwar", "lat": 29.9457, "lon": 78.1642},
+      {"district": "Rishikesh", "lat": 30.0869, "lon": 78.2676}
+    ]},
+    {"state": "West Bengal", "districts": [
+      {"district": "Kolkata", "lat": 22.5726, "lon": 88.3639},
+      {"district": "Howrah", "lat": 22.5958, "lon": 88.2636},
+      {"district": "Darjeeling", "lat": 27.0410, "lon": 88.2663},
+      {"district": "Malda", "lat": 25.0108, "lon": 88.1411}
+    ]},
+    {"state": "Andaman and Nicobar Islands", "districts": [
+      {"district": "Port Blair", "lat": 11.6234, "lon": 92.7265}
+    ]},
+    {"state": "Chandigarh", "districts": [
+      {"district": "Chandigarh", "lat": 30.7333, "lon": 76.7794}
+    ]},
+    {"state": "Dadra and Nagar Haveli and Daman and Diu", "districts": [
+      {"district": "Daman", "lat": 20.3974, "lon": 72.8328}
+    ]},
+    {"state": "Delhi", "districts": [
+      {"district": "New Delhi", "lat": 28.6139, "lon": 77.2090}
+    ]},
+    {"state": "Jammu and Kashmir", "districts": [
+      {"district": "Srinagar", "lat": 34.0837, "lon": 74.7973},
+      {"district": "Jammu", "lat": 32.7266, "lon": 74.8570}
+    ]},
+    {"state": "Ladakh", "districts": [
+      {"district": "Leh", "lat": 34.1526, "lon": 77.5770}
+    ]},
+    {"state": "Lakshadweep", "districts": [
+      {"district": "Kavaratti", "lat": 10.5593, "lon": 72.6358}
+    ]},
+    {"state": "Puducherry", "districts": [
+      {"district": "Puducherry", "lat": 11.9416, "lon": 79.8083}
+    ]}
+  ]
+}

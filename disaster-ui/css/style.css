@@ -1,0 +1,319 @@
+/* ==========================================================================
+   India Disaster Monitor -- standalone frontend styles
+   Same dark "night operations room" design language as the project's
+   Flask dashboard, so the two UIs feel like one product: a dark navy
+   ground, four named "signal" colors (one per hazard type) carry all
+   meaning, mono numerals read like instrument readouts, and a single
+   seismograph waveform across the header is the one bold signature element.
+   ========================================================================== */
+
+:root {
+  /* core */
+  --ink-900: #0B1220;
+  --ink-800: #121C30;
+  --ink-700: #182640;
+  --line: #223150;
+  --fog: #8C9BB8;
+  --paper: #ECF1F9;
+
+  /* signal colors -- one per hazard type, used consistently everywhere */
+  --signal-rain: #2FD8E0;
+  --signal-flood: #FF5470;
+  --signal-quake: #9D7BFF;
+  --signal-cyclone: #FF9457;
+  --signal-cyan: #2FD8E0; /* alias used by the waveform */
+
+  --radius: 10px;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ink-900);
+  color: var(--paper);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono { font-family: var(--font-mono); }
+
+.scanline-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    to bottom, rgba(255, 255, 255, 0.012) 0px, rgba(255, 255, 255, 0.012) 1px,
+    transparent 1px, transparent 3px
+  );
+}
+
+/* ---------- top bar ---------- */
+.topbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--ink-800), var(--ink-900));
+}
+
+.topbar__brand { flex: 0 0 auto; }
+
+.eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--signal-rain);
+  margin-bottom: 2px;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.01em;
+}
+
+.waveform {
+  flex: 1 1 auto;
+  height: 36px;
+  min-width: 120px;
+  opacity: 0.85;
+}
+.waveform polyline {
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: draw-wave 5.5s linear infinite;
+}
+@keyframes draw-wave {
+  0%   { stroke-dashoffset: 1400; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.topbar__status {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--fog);
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--signal-rain);
+  box-shadow: 0 0 0 0 rgba(47, 216, 224, 0.6);
+  animation: pulse-dot 2s ease-out infinite;
+}
+@keyframes pulse-dot {
+  0%   { box-shadow: 0 0 0 0 rgba(47, 216, 224, 0.55); }
+  70%  { box-shadow: 0 0 0 7px rgba(47, 216, 224, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(47, 216, 224, 0); }
+}
+
+/* ---------- API config bar ---------- */
+.api-bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 28px;
+  font-size: 12px;
+  color: var(--fog);
+  background: var(--ink-800);
+  border-bottom: 1px solid var(--line);
+}
+#apiBaseLabel { color: var(--signal-rain); }
+.api-bar button {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: transparent;
+  color: var(--fog);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+.api-bar button:hover { color: var(--paper); border-color: var(--fog); }
+#apiHealth { margin-left: auto; }
+#apiHealth.ok { color: var(--signal-rain); }
+#apiHealth.err { color: var(--signal-flood); }
+
+/* ---------- layout ---------- */
+.layout {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 28px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: var(--ink-800);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.panel-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--paper);
+}
+
+/* ---------- stat cards ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.stat { display: flex; flex-direction: column; gap: 4px; position: relative; }
+.stat::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 3px;
+  border-radius: var(--radius) 0 0 var(--radius);
+  background: var(--accent);
+}
+.stat[data-signal="rain"]    { --accent: var(--signal-rain); }
+.stat[data-signal="flood"]   { --accent: var(--signal-flood); }
+.stat[data-signal="quake"]   { --accent: var(--signal-quake); }
+.stat[data-signal="cyclone"] { --accent: var(--signal-cyclone); }
+
+.stat__label { font-size: 12px; color: var(--fog); }
+.stat__value { font-size: 30px; font-weight: 600; color: var(--accent); line-height: 1.1; }
+.stat__unit  { font-size: 11px; color: var(--fog); letter-spacing: 0.04em; text-transform: uppercase; }
+
+/* ---------- map row ---------- */
+.map-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(280px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.map-panel { padding-bottom: 14px; }
+#map {
+  height: 480px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.legend { display: flex; gap: 14px; font-size: 12px; color: var(--fog); }
+.legend span { display: flex; align-items: center; gap: 6px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot[data-signal="rain"]    { background: var(--signal-rain); }
+.dot[data-signal="flood"]   { background: var(--signal-flood); }
+.dot[data-signal="quake"]   { background: var(--signal-quake); }
+.dot[data-signal="cyclone"] { background: var(--signal-cyclone); }
+
+.ticker-stack { display: flex; flex-direction: column; gap: 16px; }
+.ticker { --accent: var(--fog); border-top: 2px solid var(--accent); }
+.ticker[data-signal="flood"]   { --accent: var(--signal-flood); }
+.ticker[data-signal="quake"]   { --accent: var(--signal-quake); }
+.ticker[data-signal="cyclone"] { --accent: var(--signal-cyclone); }
+
+.ticker__list { max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.ticker__item {
+  font-size: 12.5px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--ink-700);
+  border-left: 2px solid var(--accent);
+}
+.ticker__item .meta { color: var(--fog); font-size: 11px; margin-top: 2px; }
+.ticker__item .value { font-family: var(--font-mono); color: var(--accent); }
+
+.empty { color: var(--fog); font-size: 12.5px; font-style: italic; margin: 6px 0; }
+
+/* ---------- lower row: chart + table ---------- */
+.lower-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
+}
+.chart-panel canvas { width: 100% !important; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  text-align: left;
+  color: var(--fog);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+}
+tbody td {
+  padding: 8px 8px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody td:first-child { font-family: var(--font-body); }
+
+.foot {
+  text-align: center;
+  color: var(--fog);
+  font-size: 11px;
+  padding-top: 8px;
+}
+
+/* ---------- leaflet marker pulse (radar ping) ---------- */
+.pulse-marker {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+.pulse-marker::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0.6;
+  animation: ping 1.8s ease-out infinite;
+}
+@keyframes ping {
+  0%   { transform: scale(0.5); opacity: 0.7; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1080px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .map-row { grid-template-columns: 1fr; }
+  .lower-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .stats { grid-template-columns: 1fr; }
+  .topbar { flex-wrap: wrap; }
+  .waveform { order: 3; width: 100%; }
+  .api-bar { flex-wrap: wrap; }
+}

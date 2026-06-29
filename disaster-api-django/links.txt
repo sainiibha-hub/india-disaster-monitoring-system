@@ -1,0 +1,5 @@
+http://127.0.0.1:8000/api/rainfall/latest/
+http://127.0.0.1:8000/api/floods/
+http://127.0.0.1:8000/api/earthquakes/
+http://127.0.0.1:8000/api/cyclones/
+http://127.0.0.1:8000/api/rainfall/trend/

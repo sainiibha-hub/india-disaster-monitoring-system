@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>India Disaster Monitor &mdash; Live Operations</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="scanline-bg" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="topbar__brand">
+    <span class="eyebrow">LIVE OPERATIONS &middot; DJANGO API</span>
+    <h1>India Disaster Monitor</h1>
+  </div>
+
+  <svg class="waveform" viewBox="0 0 600 40" preserveAspectRatio="none" aria-hidden="true">
+    <polyline id="waveformPath" fill="none" stroke="var(--signal-cyan)" stroke-width="1.5"
+      points="0,20 20,20 30,8 40,32 50,20 70,20 90,20 100,4 110,36 120,20 140,20 160,20 170,12 180,28 190,20 210,20 230,20 240,6 250,34 260,20 280,20 300,20 310,10 320,30 330,20 350,20 370,20 380,2 390,38 400,20 420,20 440,20 450,14 460,26 470,20 490,20 510,20 520,8 530,32 540,20 560,20 580,20 600,20"/>
+  </svg>
+
+  <div class="topbar__status">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="clock" class="mono"></span>
+  </div>
+</header>
+
+<div class="api-bar mono" id="apiBar">
+  API: <span id="apiBaseLabel"></span>
+  <button id="apiEditBtn" type="button">change</button>
+  <span id="apiHealth"></span>
+</div>
+
+<main class="layout">
+
+  <!-- Stat cards -->
+  <section class="stats" aria-label="Summary">
+    <div class="card stat" data-signal="rain">
+      <span class="stat__label">Avg rainfall today</span>
+      <span class="stat__value mono" id="statRainfall">&ndash;</span>
+      <span class="stat__unit">mm</span>
+    </div>
+    <div class="card stat" data-signal="flood">
+      <span class="stat__label">Flood alerts today</span>
+      <span class="stat__value mono" id="statFloods">&ndash;</span>
+      <span class="stat__unit">stations</span>
+    </div>
+    <div class="card stat" data-signal="quake">
+      <span class="stat__label">Earthquakes (30d, M&ge;5.0)</span>
+      <span class="stat__value mono" id="statQuakes">&ndash;</span>
+      <span class="stat__unit">events</span>
+    </div>
+    <div class="card stat" data-signal="cyclone">
+      <span class="stat__label">Cyclone advisories today</span>
+      <span class="stat__value mono" id="statCyclones">&ndash;</span>
+      <span class="stat__unit">active</span>
+    </div>
+  </section>
+
+  <!-- Map + side ticker panels -->
+  <section class="map-row">
+    <div class="card map-panel">
+      <div class="panel-head">
+        <h2>National hazard map</h2>
+        <div class="legend">
+          <span><i class="dot" data-signal="rain"></i>Rainfall</span>
+          <span><i class="dot" data-signal="flood"></i>Flood-prone</span>
+          <span><i class="dot" data-signal="quake"></i>Earthquake</span>
+          <span><i class="dot" data-signal="cyclone"></i>Cyclone</span>
+        </div>
+      </div>
+      <div id="map"></div>
+    </div>
+
+    <div class="ticker-stack">
+      <div class="card ticker" data-signal="flood">
+        <div class="panel-head"><h2>Flood alerts</h2></div>
+        <div class="ticker__list" id="floodList"><p class="empty">Loading&hellip;</p></div>
+      </div>
+
+      <div class="card ticker" data-signal="quake">
+        <div class="panel-head"><h2>Recent earthquakes</h2></div>
+        <div class="ticker__list" id="quakeList"><p class="empty">Loading&hellip;</p></div>
+      </div>
+
+      <div class="card ticker" data-signal="cyclone">
+        <div class="panel-head"><h2>Cyclone advisories</h2></div>
+        <div class="ticker__list" id="cycloneList"><p class="empty">Loading&hellip;</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trend chart + top states -->
+  <section class="lower-row">
+    <div class="card chart-panel">
+      <div class="panel-head"><h2>Rainfall trend &mdash; last 30 days</h2></div>
+      <canvas id="rainfallChart" height="260"></canvas>
+    </div>
+
+    <div class="card table-panel">
+      <div class="panel-head"><h2>Highest rainfall states &mdash; today</h2></div>
+      <table id="topStatesTable">
+        <thead>
+          <tr><th>State</th><th>Avg (mm)</th><th>Peak (mm)</th></tr>
+        </thead>
+        <tbody><tr><td colspan="3" class="empty">Loading&hellip;</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="foot mono">
+    Standalone frontend &mdash; all data fetched live from the Django REST API. No backend rendering here, this is plain HTML/CSS/JS.
+  </footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
