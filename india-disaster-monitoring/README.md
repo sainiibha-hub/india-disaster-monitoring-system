@@ -1,235 +1,782 @@
-# India Disaster Monitoring System
+# 🇮🇳 India Disaster Monitoring System
 
-A Python + MySQL + Flask system that monitors four hazard types across
-India: rainfall, river floods, earthquakes, and tropical cyclones. It
-collects data on a schedule, stores it in MySQL, raises flood alerts
-automatically, generates a daily summary report, and serves a live
-dashboard with an interactive map.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Django-5.x-092E20?style=for-the-badge&logo=django&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Flask-3.x-000000?style=for-the-badge&logo=flask&logoColor=white"/>
+  <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/REST_API-Django-red?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/License-MIT-success?style=for-the-badge"/>
+</p>
 
-## What's real vs. simulated (read this first)
+<p align="center">
+  <b>A Full-Stack Disaster Monitoring Platform for India</b><br>
+  Real-time weather monitoring, earthquake tracking, flood alerts, cyclone advisory simulation, REST APIs, and interactive dashboards.
+</p>
 
-This system is built to be honest about data sources:
+---
 
-| Hazard      | Source                                   | Status |
-|-------------|-------------------------------------------|--------|
-| Rainfall, temperature, humidity | [OpenWeatherMap](https://openweathermap.org/api) current-weather API | **Real**, needs a free API key |
-| Earthquakes | [USGS Earthquake Catalog](https://earthquake.usgs.gov/fdsnws/event/1/query) | **Real**, public, no key needed |
-| River flood levels | Central Water Commission (CWC) gauge data | **Simulated** -- CWC does not publish a simple public REST API. The simulator generates realistic readings around each station's real normal/warning/danger thresholds, including occasional flood-risk excursions, so the full alerting pipeline is testable end-to-end. |
-| Cyclone advisories | India Meteorological Department (IMD) / RSMC New Delhi | **Simulated** -- IMD does not publish a public REST API either. The simulator produces occasional plausible advisories, weighted toward the real April-June and October-December cyclone seasons. |
+## 📖 Overview
 
-Both simulated feeds are built so a **real feed can be plugged in with zero
-changes anywhere else in the system**: set `FLOOD_API_URL` / `CYCLONE_API_URL`
-in `.env` and adjust the small `_fetch_from_api()` function in
-`core/flood.py` / `core/cyclone.py` to match that feed's response shape.
+The **India Disaster Monitoring System** is a full-stack disaster intelligence platform designed to monitor multiple natural hazards across India from a single dashboard.
 
-The rainfall district list (`data/india_states_districts.json`) covers all
-36 states/UTs with a representative set of ~90 major districts/cities
-rather than the full 700+ district list, to keep the demo's API usage and
-runtime sane. Add more entries in the same shape to extend it -- no code
-changes required.
+The system automatically collects live environmental data, stores it in a centralized MySQL database, analyzes potential disaster conditions, and exposes the information through both a **Flask Dashboard** and a **Django REST API**.
 
-## Architecture
+Unlike simple dashboards, this project combines:
 
+- 🌧 Live Rainfall Monitoring
+- 🌊 Flood Alert Generation
+- 🌍 Earthquake Tracking
+- 🌪 Cyclone Advisory Monitoring
+- 📊 Data Visualization
+- 🔌 REST API
+- 🗄 Centralized Database
+- 📈 Automated Daily Reports
+
+This project demonstrates backend development, API development, database design, automation, and frontend visualization in one integrated application.
+
+---
+
+# ✨ Features
+
+## 🌧 Rainfall Monitoring
+
+- Live rainfall data using OpenWeatherMap API
+- Temperature monitoring
+- Humidity monitoring
+- Latitude & Longitude tracking
+- Covers all Indian States & Union Territories
+
+---
+
+## 🌊 Flood Monitoring
+
+- River water level monitoring
+- Warning level detection
+- Danger level detection
+- Automatic flood alert generation
+- Historical flood records
+
+---
+
+## 🌍 Earthquake Monitoring
+
+- Live USGS Earthquake Feed
+- Magnitude ≥ 5 filtering
+- Last 30-day earthquake records
+- Location tracking
+- Magnitude analysis
+
+---
+
+## 🌪 Cyclone Advisory
+
+- Seasonal cyclone monitoring
+- IMD-style advisory simulation
+- Warning generation
+- Future integration ready for live APIs
+
+---
+
+## 📊 Analytics
+
+Generate useful reports such as:
+
+- Highest rainfall states
+- Flood affected districts
+- Earthquake history
+- Rainfall trends
+- Daily reports
+- Disaster summaries
+
+---
+
+# 🏗 System Architecture
+
+```text
+                    +----------------------+
+                    | OpenWeatherMap API   |
+                    +----------+-----------+
+                               |
+                               |
+                    +----------v-----------+
+                    |  Python Collector    |
+                    +----------+-----------+
+                               |
+          +--------------------+--------------------+
+          |                                         |
++---------v---------+                     +----------v----------+
+| USGS Earthquake   |                     | Cyclone Simulator   |
+| Live API          |                     | Flood Simulator     |
++---------+---------+                     +----------+----------+
+          |                                         |
+          +--------------------+--------------------+
+                               |
+                    +----------v-----------+
+                    |     MySQL Database   |
+                    +----------+-----------+
+                               |
+             +-----------------+-----------------+
+             |                                   |
++------------v------------+         +------------v------------+
+| Django REST API         |         | Flask Dashboard         |
++------------+------------+         +------------+------------+
+             |                                   |
+             |                                   |
+      +------v------+                    +-------v-------+
+      | JavaScript  |                    | Interactive   |
+      | Frontend    |                    | Web Dashboard |
+      +-------------+                    +---------------+
 ```
-                     ┌─────────────────┐
-                     │   scheduler.py   │  (runs daily, or use cron/Task Scheduler)
-                     └────────┬─────────┘
-                              │ calls
-                     ┌────────▼─────────┐
-                     │     main.py      │  orchestrator
-                     └────────┬─────────┘
-        ┌──────────┬──────────┼───────────┬─────────────┐
-        ▼          ▼          ▼           ▼             ▼
-   rainfall.py  flood.py  earthquake.py cyclone.py   alerts.py / reports.py
-        │          │          │           │             │
-        └──────────┴──────────┴───────────┴─────────────┘
-                              │
-                     ┌────────▼─────────┐
-                     │   MySQL database  │
-                     └────────┬─────────┘
-                              │ reads
-                     ┌────────▼─────────┐
-                     │  dashboard/app.py │  Flask + REST API
-                     └────────┬─────────┘
-                              │ serves
-                     ┌────────▼─────────┐
-                     │  dashboard.html   │  Leaflet map + Chart.js
-                     └───────────────────┘
+
+---
+
+# 📌 Key Highlights
+
+✅ Live Weather Monitoring
+
+✅ Real-Time Earthquake Tracking
+
+✅ Automatic Flood Alerts
+
+✅ Cyclone Advisory System
+
+✅ Flask Dashboard
+
+✅ Django REST API
+
+✅ Interactive Maps
+
+✅ Charts & Analytics
+
+✅ MySQL Relational Database
+
+✅ Automated Daily Reports
+
+---
+
+# 📂 Repository Structure
+
+```text
+India-Disaster-Monitoring-System/
+
+│
+├── india-disaster-monitoring/
+│      Python Data Collection Engine
+│      Flask Dashboard
+│
+├── disaster-api-django/
+│      Django REST API
+│
+├── disaster-ui/
+│      Standalone JavaScript Frontend
+│
+├── screenshots/
+│      Dashboard Images
+│
+└── README.md
 ```
 
-## Project structure
+---
 
+## 📸 Project Preview
+
+> **Dashboard screenshots will be added here**
+
+### Flask Dashboard
+
+<img src="screenshots/flask-dashboard.png" width="900">
+
+---
+
+### Disaster Map
+
+<img src="screenshots/map.png" width="900">
+
+---
+
+### Analytics Dashboard
+
+<img src="screenshots/chart.png" width="900">
+
+---
+# ⚙️ Installation
+
+## 📋 Prerequisites
+
+Before running this project, make sure the following software is installed:
+
+- Python **3.9+**
+- MySQL **8.0+**
+- Git
+- pip
+- Virtual Environment (Recommended)
+
+---
+
+# 🚀 Getting Started
+
+## 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/India-Disaster-Monitoring-System.git
+
+cd India-Disaster-Monitoring-System
 ```
-india-disaster-monitoring/
-├── main.py                    # Orchestrator: --setup / --run / --report
-├── scheduler.py                # Runs main.py's cycle automatically every day
-├── config.py                   # All settings (DB, API keys, thresholds)
-├── logger_config.py             # Centralized logging (console + rotating file)
-├── requirements.txt
-├── .env.example                 # Copy to .env and fill in your values
-├── README.md
-│
-├── core/
-│   ├── database.py             # create_database(), create_tables(), insert_data(), fetch_all()
-│   ├── rainfall.py             # fetch_rainfall_data()
-│   ├── flood.py                # fetch_flood_data()
-│   ├── earthquake.py           # fetch_earthquake_data()
-│   ├── cyclone.py              # fetch_cyclone_data()
-│   ├── alerts.py                # generate_alerts()
-│   └── reports.py               # generate_daily_report()
-│
-├── data/
-│   └── india_states_districts.json   # State -> district -> lat/lon reference data
-│
-├── db/
-│   ├── schema.sql               # Full DDL (mirrors core/database.py)
-│   └── analysis_queries.sql     # The 4 requested analysis queries + a summary query
-│
-├── dashboard/
-│   ├── app.py                   # Flask app + REST API
-│   ├── templates/
-│   │   └── dashboard.html
-│   └── static/
-│       ├── css/style.css
-│       └── js/dashboard.js
-│
-├── logs/                        # disaster_monitoring.log (rotating)
-└── reports/                     # report_YYYY-MM-DD.txt (one per day)
-```
 
-## Setup
+---
 
-### 1. Prerequisites
+## 2️⃣ Create a Virtual Environment
 
-- Python 3.9+
-- A running MySQL server (8.0+ recommended) you can connect to
-- A free [OpenWeatherMap API key](https://openweathermap.org/api) (for rainfall data)
-
-### 2. Install dependencies
+### Windows
 
 ```bash
 python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+
+venv\Scripts\activate
+```
+
+### Linux / macOS
+
+```bash
+python3 -m venv venv
+
+source venv/bin/activate
+```
+
+---
+
+## 3️⃣ Install Dependencies
+
+Install dependencies for each component.
+
+### Flask Backend
+
+```bash
+cd india-disaster-monitoring
+
 pip install -r requirements.txt
 ```
 
-### 3. Configure
+### Django API
 
 ```bash
-cp .env.example .env
-# edit .env: set DB_PASSWORD, OPENWEATHER_API_KEY, etc.
+cd ../disaster-api-django
+
+pip install -r requirements.txt
 ```
 
-### 4. Create the database and tables
+---
+
+# 🗄 Database Setup
+
+Create a MySQL database.
+
+```sql
+CREATE DATABASE disaster_monitoring;
+```
+
+Update your MySQL credentials inside the configuration file.
+
+Example:
+
+```python
+DB_HOST = "localhost"
+DB_USER = "root"
+DB_PASSWORD = "your_password"
+DB_NAME = "disaster_monitoring"
+```
+
+---
+
+# ▶ Running the Project
+
+## Step 1
+
+Start the Flask data collector.
 
 ```bash
-python main.py --setup
+cd india-disaster-monitoring
+
+python app.py
 ```
 
-This calls `create_database()` then `create_tables()`. Safe to re-run any
-time -- everything uses `CREATE ... IF NOT EXISTS`.
+---
 
-### 5. Run one monitoring cycle manually
+## Step 2
 
-```bash
-python main.py --run
-```
-
-This calls, in order: `fetch_rainfall_data()` → `fetch_flood_data()` →
-`generate_alerts()` → `fetch_earthquake_data()` → `fetch_cyclone_data()` →
-`generate_daily_report()`. Watch `logs/disaster_monitoring.log` (or the
-console) for progress and any warnings/errors -- each feed is wrapped in
-its own try/except so one feed failing (e.g. no internet, bad API key)
-doesn't stop the others from running.
-
-### 6. Launch the dashboard
-
-```bash
-python dashboard/app.py
-```
-
-Open **http://localhost:5000** in your browser. The map and panels
-auto-refresh every 60 seconds.
-
-## Automatic daily scheduling
-
-**Option A -- built-in scheduler (simplest, cross-platform):**
+Run the scheduler (optional).
 
 ```bash
 python scheduler.py
 ```
 
-Runs once immediately, then every day at the time set by `DAILY_RUN_TIME`
-in `.env` (default `06:00`). Keep this process running (e.g. in `screen`,
-`tmux`, a Docker container, or as a service).
+This will automatically collect disaster data and generate daily reports.
 
-**Option B -- cron (Linux/macOS):**
+---
 
-```bash
-crontab -e
-# add:
-0 6 * * * cd /path/to/india-disaster-monitoring && /path/to/venv/bin/python main.py --run >> logs/cron.log 2>&1
-```
+## Step 3
 
-**Option C -- systemd timer (Linux):** create a `.service` that runs
-`python main.py --run` and a matching `.timer` with `OnCalendar=06:00`.
-
-**Option D -- Windows Task Scheduler:** create a daily trigger that runs
-`python.exe main.py --run` with "Start in" set to the project folder.
-
-## Generating a report on demand
+Start Django REST API.
 
 ```bash
-python main.py --report
+cd disaster-api-django
+
+python manage.py migrate
+
+python manage.py runserver
 ```
 
-Writes `reports/report_YYYY-MM-DD.txt` and upserts a row in `daily_reports`.
+API will be available at
 
-## SQL analysis queries
+```
+http://127.0.0.1:8000/
+```
 
-See `db/analysis_queries.sql` for ready-to-run queries covering:
+---
 
-1. States with the highest rainfall
-2. Districts/stations currently under flood alert
-3. Recent earthquakes (last 30 days, M ≥ 5.0)
-4. Rainfall trends over the last 30 days
+## Step 4
 
-These same queries (or close variants) back the dashboard's `/api/*`
-endpoints in `dashboard/app.py`.
+Run the Frontend
 
-## Function reference (as required by the spec)
+Open
 
-All located under `core/`, re-exported at the top of `main.py`:
+```
+disaster-ui/index.html
+```
 
-| Function | File | Purpose |
-|---|---|---|
-| `create_database()` | `core/database.py` | Creates the MySQL database if missing |
-| `create_tables()` | `core/database.py` | Creates all 9 tables if missing |
-| `fetch_rainfall_data()` | `core/rainfall.py` | Pulls rainfall/temp/humidity per district from OpenWeatherMap |
-| `fetch_flood_data()` | `core/flood.py` | Pulls/simulates river water levels |
-| `fetch_earthquake_data()` | `core/earthquake.py` | Pulls M≥5.0 earthquakes from USGS (last 30 days) |
-| `fetch_cyclone_data()` | `core/cyclone.py` | Pulls/simulates cyclone advisories |
-| `generate_alerts()` | `core/alerts.py` | Compares water levels to danger thresholds, writes `flood_alerts` |
-| `insert_data()` | `core/database.py` | Generic parameterised INSERT used by every fetch function |
-| `generate_daily_report()` | `core/reports.py` | Aggregates the day's activity into `daily_reports` + a text file |
+or use
 
-## Logging & error handling
+```bash
+python -m http.server
+```
 
-- Every module logs to both the console and `logs/disaster_monitoring.log`
-  (rotating, 5MB × 5 backups) via `logger_config.get_logger(__name__)`.
-- Every network call and database operation is wrapped in `try/except` with
-  specific exception types caught where possible (`requests.RequestException`,
-  `mysql.connector.Error`, `KeyError`/`ValueError` for malformed payloads).
-- `main.py`'s `run_monitoring_cycle()` wraps each of the five pipeline steps
-  in its own try/except so a single feed failing never stops the others.
+---
 
-## Extending this system
+# 🔌 REST API
 
-- **Full district coverage:** add entries to `data/india_states_districts.json`.
-- **Real flood data:** set `FLOOD_API_URL` and adapt `core/flood.py::_fetch_from_api()`.
-- **Real cyclone data:** set `CYCLONE_API_URL` and adapt `core/cyclone.py::_fetch_from_api()`.
-- **Notifications:** `generate_alerts()` is the natural place to add SMS/email/push
-  notifications -- it already knows the severity and message for every alert raised.
-- **Rainfall heatmap:** the dashboard currently uses sized circle markers; swap in
-  the `leaflet.heat` plugin against the same `/api/rainfall/latest` data if you want
-  a smoothed heatmap instead.
+## Rainfall
+
+```
+GET /api/rainfall/
+```
+
+Returns:
+
+- Rainfall
+- Temperature
+- Humidity
+- District
+- State
+
+---
+
+## Flood Alerts
+
+```
+GET /api/flood-alerts/
+```
+
+Returns:
+
+- River Name
+- Water Level
+- Warning Level
+- Danger Level
+- Alert Status
+
+---
+
+## Earthquakes
+
+```
+GET /api/earthquakes/
+```
+
+Returns
+
+- Magnitude
+- Location
+- Latitude
+- Longitude
+- Event Time
+
+---
+
+## Cyclone Advisories
+
+```
+GET /api/cyclones/
+```
+
+Returns
+
+- Advisory
+- State
+- Severity
+- Status
+
+---
+
+# 📊 Database Design
+
+The project uses a **normalized relational database** consisting of multiple interconnected tables.
+
+Main tables include:
+
+- States
+- Districts
+- Rainfall
+- Rivers
+- Water Levels
+- Flood Alerts
+- Earthquakes
+- Cyclone Advisories
+- Daily Reports
+
+Relationship Overview
+
+```
+States
+   │
+Districts
+   │
+Rainfall
+
+Rivers
+   │
+Water Levels
+   │
+Flood Alerts
+
+Earthquakes
+
+Cyclone Alerts
+
+Daily Reports
+```
+
+---
+
+# 📈 SQL Analysis
+
+Example analytical queries supported by the project:
+
+✅ Highest Rainfall State
+
+✅ Highest Rainfall District
+
+✅ Districts Under Flood Alert
+
+✅ Recent Earthquakes
+
+✅ River Water Levels
+
+✅ Daily Disaster Summary
+
+✅ 30-Day Rainfall Trends
+
+---
+
+# 🛠 Tech Stack
+
+## Backend
+
+- Python
+- Flask
+- Django
+- Django REST Framework
+
+## Database
+
+- MySQL
+
+## Frontend
+
+- HTML5
+- CSS3
+- JavaScript
+- Leaflet.js
+- Chart.js
+
+## Libraries
+
+- pandas
+- requests
+- mysql-connector-python
+- schedule
+
+---
+
+# 📂 Folder Structure
+
+```
+India-Disaster-Monitoring-System/
+
+├── india-disaster-monitoring/
+│   ├── collector.py
+│   ├── scheduler.py
+│   ├── app.py
+│   ├── requirements.txt
+│
+├── disaster-api-django/
+│   ├── manage.py
+│   ├── api/
+│   ├── requirements.txt
+│
+├── disaster-ui/
+│   ├── css/
+│   ├── js/
+│   ├── index.html
+│
+├── screenshots/
+│
+└── README.md
+```
+
+---
+
+# 💡 Project Use Cases
+
+- Disaster Monitoring Centers
+- Educational Projects
+- Weather Analysis
+- REST API Learning
+- Data Visualization
+- GIS Demonstration
+- Backend Development Practice
+- Full Stack Portfolio Project 
+
+---
+
+# 📸 Screenshots
+
+Visual previews help visitors quickly understand your project.
+
+## 🖥 Flask Dashboard
+
+<p align="center">
+<img src="screenshots/flask-dashboard.png" width="900">
+</p>
+
+---
+
+## 🌍 Disaster Monitoring Map
+
+<p align="center">
+<img src="screenshots/disaster-map.png" width="900">
+</p>
+
+---
+
+## 📊 Analytics Dashboard
+
+<p align="center">
+<img src="screenshots/analytics.png" width="900">
+</p>
+
+---
+
+## 📱 Django REST API
+
+<p align="center">
+<img src="screenshots/api.png" width="900">
+</p>
+
+---
+
+# 🎥 Demo
+
+> Add a short demo GIF or screen recording here.
+
+Example:
+
+```
+demo/demo.gif
+```
+
+or
+
+```
+https://youtu.be/your-demo-video
+```
+
+---
+
+# 🌟 Project Highlights
+
+✔ Full Stack Application
+
+✔ Python Automation
+
+✔ Django REST API
+
+✔ Flask Dashboard
+
+✔ Interactive Maps
+
+✔ SQL Database Design
+
+✔ Data Collection Automation
+
+✔ Disaster Analytics
+
+✔ Clean Project Architecture
+
+✔ Recruiter Friendly Portfolio Project
+
+---
+
+# 🚀 Future Improvements
+
+This project can be extended with several real-world features.
+
+- [ ] Docker Support
+- [ ] Kubernetes Deployment
+- [ ] AWS Deployment
+- [ ] SMS Alerts
+- [ ] Email Notifications
+- [ ] WhatsApp Alerts
+- [ ] AI-based Disaster Prediction
+- [ ] Machine Learning Risk Analysis
+- [ ] Satellite Image Integration
+- [ ] Mobile Application
+- [ ] User Authentication
+- [ ] Admin Dashboard
+- [ ] Real IMD API Integration
+- [ ] Real CWC API Integration
+
+---
+
+# 📊 Performance
+
+Current implementation supports
+
+- Multiple Disaster Types
+- Modular Architecture
+- REST API
+- Scheduled Automation
+- Centralized Database
+- Interactive Visualization
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome!
+
+To contribute:
+
+```bash
+Fork this repository
+
+Create a feature branch
+
+git checkout -b feature-name
+
+Commit your changes
+
+git commit -m "Added new feature"
+
+Push
+
+git push origin feature-name
+
+Open a Pull Request
+```
+
+Please make sure your code follows clean coding practices.
+
+---
+
+# 🐞 Reporting Issues
+
+Found a bug?
+
+Please open an issue with:
+
+- Description
+- Expected Behaviour
+- Actual Behaviour
+- Steps to Reproduce
+
+---
+
+# ⭐ Support
+
+If you found this project useful,
+
+please consider giving it a ⭐ on GitHub.
+
+It really helps!
+
+---
+
+# 📚 Learning Outcomes
+
+This project demonstrates practical experience with:
+
+- Python Programming
+- Flask Development
+- Django REST Framework
+- REST APIs
+- MySQL
+- SQL Queries
+- Scheduled Automation
+- Data Collection
+- API Integration
+- Leaflet Maps
+- Chart.js
+- Full Stack Development
+
+---
+
+# 🙏 Acknowledgements
+
+Special thanks to the following public data providers:
+
+- OpenWeatherMap
+- USGS Earthquake Program
+
+This project is built for educational and portfolio purposes.
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
+
+See the **LICENSE** file for details.
+
+---
+
+# 👨‍💻 Author
+
+**Ibha Saini**
+
+Computer Science Student
+
+Passionate about
+
+- Python
+- Django
+- Machine Learning
+- Artificial Intelligence
+- Data Science
+- Full Stack Development
+
+GitHub:
+https://github.com/YOUR_USERNAME
+
+LinkedIn:
+https://linkedin.com/in/YOUR_PROFILE
+
+---
+
+<p align="center">
+
+Made with ❤️ using Python, Django, Flask and MySQL
+
+⭐ Star this repository if you found it useful!
+
+</p>
