@@ -46,7 +46,7 @@ Each folder has its own README with detailed setup steps.
 - Daily automated reports (scheduler.py / cron / Task Scheduler)
 - Two independent live dashboards: a server-rendered Flask UI and a separate Django-API-backed JS frontend
 - Centralized logging and exception handling throughout
-- SQL analysis queries: highest-rainfall states, districts under flood alert, recent earthquakes, 30-day rainfall trend
+- SQL analysis queries: highest-rainfall states, districts under flood alert, recent earthquakes, 30-day rainfall trends
 
 ## Quick start
 
