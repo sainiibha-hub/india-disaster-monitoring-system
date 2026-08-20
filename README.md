@@ -17,7 +17,7 @@ standalone JS dashboard.
 
 | Hazard | Source | Behaviour |
 |---|---|---|
-| Rainfall | OpenWeatherMap (live) | Collects rainfall, temperature, humidity for districts across all 36 states/UTs |
+| Rainfall | OpenWeatherMap (live) | Collects rainfall, temperature, humidity of districts across all 36 states/UTs |
 | Floods | Simulated CWC-style gauge data | Compares river levels to danger thresholds and raises alerts automatically |
 | Earthquakes | USGS (live, public) | Pulls M >= 5.0 events near India from the last 30 days |
 | Cyclones | Simulated IMD-style advisories | Seasonal advisory simulation (Apr-Jun, Oct-Dec) |
